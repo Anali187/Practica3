@@ -35,8 +35,27 @@ df <- read.csv("epa_http.csv", sep = " ")
 df
 ```
 
-### Pregunta3: Limpieza de los Datos
-#
+### Pregunta 2:
+  Incluid en el documento un apartado con la descripción de los datos
+  analizados: fuente, tipología, descripción de la información contenida
+  (los diferentes campos) y sus valores.
+>>>>>>> efa87525c202fc6657a8ae4789a8ee646695faa4
 
- 
+ - **Fuente:**  
+      Profesorado (Arnau)
+
+- **Tipología:**  
+     Fichero de log de servidor web (Apache)
+
+- **Descripción de la información:**  
+     Los datos analizados corresponden a registros generados por un servidor web Apache.  
+     Cada registro representa una petición HTTP realizada por un usuario al servidor.
+     
+
+### Pregunta 3: 
+Aprovechando que los datos a analizar son los mismos de la primera 
+práctica, para esta entrega es imprescindible que los datos estén en 
+formato de “datos elegantes”. 
+
+
 
