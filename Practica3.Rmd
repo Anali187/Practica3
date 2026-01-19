@@ -35,5 +35,17 @@ df <- read.csv("epa_http.csv", sep = " ")
 df
 ```
 
-### Pregunta 1:
+### Pregunta 2:
+  Incluid en el documento un apartado con la descripción de los datos
+  analizados: fuente, tipología, descripción de la información contenida
+  (los diferentes campos) y sus valores.
 
+ - **Fuente:**  
+      Profesorado (Arnau)
+
+- **Tipología:**  
+     Fichero de log de servidor web (Apache)
+
+- **Descripción de la información:**  
+     Los datos analizados corresponden a registros generados por un servidor web Apache.  
+     Cada registro representa una petición HTTP realizada por un usuario al servidor.
