@@ -35,5 +35,8 @@ df <- read.csv("epa_http.csv", sep = " ")
 df
 ```
 
-### Pregunta 1:
+### Pregunta3: Limpieza de los Datos
+#
+
+ 
 
