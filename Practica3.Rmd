@@ -71,5 +71,17 @@ epa_http$PROTOCOLO <- as.factor(epa_http$PROTOCOLO)
 # Extraer tiempo (adición nueva columna HORA) 
 epa_http$HORA <- str_sub(epa_http$TIMESTAMP, start =5, end=6)
 
+# Transformar el campo BYTES_RESPUESTA en entero y cambiar "-" por NA 
+epa_http$BYTES_RESPUESTA[epa_http$BYTES_RESPUESTA == "-"] <- NA
+epa_http$BYTES_RESPUESTA[epa_http$BYTES_RESPUESTA == "0"] <- NA
+epa_http$BYTES_RESPUESTA <- as.numeric(epa_http$BYTES_RESPUESTA)
 ```
+
+### Pregunta 4:
+Identificar el número único de usuarios que han interactuado 
+directamente con el servidor de forma segregada según si los usuarios 
+han tenido algún tipo de error en las distintas peticiones ofrecidas por el 
+servidor.
+
+
 
