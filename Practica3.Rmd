@@ -7,5 +7,33 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+``` 
+
+
+```{r carga_libs, include=FALSE}
+library(dplyr)
+library(knitr)
+library(readr)
 ```
+
+Análisis de logs de servidor usando R (parte II) 
+
+### Pregunta 1:
+Descomprimir el fichero comprimido que contiene los registros del 
+servidor, y a partir de los datos extraídos, cargar en data frame los 
+registros con las peticiones servidas. 
+
+```{r carga_datos_base, echo=TRUE}
+epa_http <- read_table("epa_http.csv", col_names = FALSE, show_col_types = F)
+
+is.data.frame(epa_http)
+
+```
+
+```{r carga_datos_otra_opcion, echo=FALSE}
+df <- read.csv("epa_http.csv", sep = " ")
+df
+```
+
+### Pregunta 1:
 
