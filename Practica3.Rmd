@@ -28,15 +28,11 @@ registros con las peticiones servidas.
 epa_http <- read_table("epa_http.csv", col_names = FALSE, show_col_types = F)
 ```
 
-```{r carga_datos_otra_opcion, echo=FALSE}
-df <- read.csv("epa_http.csv", sep = " ")
-```
-Aplicar nombres descriptivos a las columnas del DS:
-
+Aplicar nombres descriptivos a las columnas del DS/DF:
 ```{r categorizaciontablas_datos}
+# Aplicar nombres descriptivos a las columnas del DS:
 colnames(epa_http) <- c("FQDN/IP","TIMESTAMP","PETICION_HTTP","URL","PROTOCOLO","CODIGO_HTTP","BYTES_RESPUESTA")
 ```
-
 
 ### Pregunta 2:
   Incluid en el documento un apartado con la descripción de los datos
@@ -83,5 +79,7 @@ directamente con el servidor de forma segregada según si los usuarios
 han tenido algún tipo de error en las distintas peticiones ofrecidas por el 
 servidor.
 
-
-
+```{r get_resp_code, echo=TRUE}
+# Obtener los codigos de respuesta erroneos
+epa_http$CODIGO_HTTP[epa_http$CODIGO_HTTP != "200" ] 
+```
