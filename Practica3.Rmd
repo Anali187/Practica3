@@ -81,32 +81,27 @@ directamente con el servidor de forma segregada según si los usuarios
 han tenido algún tipo de error en las distintas peticiones ofrecidas por el 
 servidor.
 
-```{r get_resp_code,eval=FALSE,echo=TRUE}
-# Obtener los codigos de respuesta erroneos
+```{r get_resp_code,echo=TRUE}
+# Mostrar los errores por el acceso del usuario
+respuestas_erroneas <- epa_http %>%
+  filter(CODIGO_HTTP >= 400) %>%
+  count(`FQDN/IP`, CODIGO_HTTP, name = "ERRORES") %>%
+  arrange(desc(ERRORES))
 
-logs_clasificado <- epa_http %>%
-  mutate(
-    tipo = if_else(CODIGO_HTTP >= 400, "Con error", "Sin error")
+# Mostrar la tabla de errores completa
+datatable(
+  respuestas_erroneas,
+  options = list(
+    pageLength = 10,   # Número de filas por página
+    lengthMenu = c(5, 10, 20, 50),
+    scrollY = "400px",
+    scrollCollapse = TRUE
   )
+)
 ```
-
-
-``` {r get_resp_code_second_opt,echo=TRUE}
-
-epa_http %>%
-  filter(CODIGO_HTTP >=400) %>%
-  group_by(`FQDN/IP`, CODIGO_HTTP) %>%
-  count()
-
-# forzar el valor base del número de filas por página a 10
-datatable(epa_http,
-          options = list(
-            pageLength = 10,
-            order=list(list(1,"desc"))
-          ))
-```
-
-#datatable(head(epa_http),colnames = c("Usuario", "Codigo respuesta", "Numero errores"))
-
-```
+### Pregunta 5:
+Analizar los distintos tipos de peticiones HTTP (GET, POST, PUT, DELETE) 
+gestionadas por el servidor, identificando la frecuencia de cada una de 
+estas. Repetir el análisis, esta vez filtrando previamente aquellas 
+peticiones correspondientes a recursos ofrecidos de tipo imagen. 
 
