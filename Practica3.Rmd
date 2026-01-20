@@ -98,6 +98,15 @@ epa_http %>%
   group_by(`FQDN/IP`, CODIGO_HTTP) %>%
   count()
 
-datatable(head(epa_http),colnames = c("Usuario", "Codigo respuesta", "Numero errores"))
+# forzar el valor base del número de filas por página a 10
+datatable(epa_http,
+          options = list(
+            pageLength = 10,
+            order=list(list(1,"desc"))
+          ))
+```
+
+#datatable(head(epa_http),colnames = c("Usuario", "Codigo respuesta", "Numero errores"))
+
 ```
 
