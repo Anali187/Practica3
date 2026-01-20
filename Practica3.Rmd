@@ -81,5 +81,8 @@ servidor.
 
 ```{r get_resp_code, echo=TRUE}
 # Obtener los codigos de respuesta erroneos
-epa_http$CODIGO_HTTP[epa_http$CODIGO_HTTP != "200" ] 
-```
+#num_error <- as.numeric(epa_http$CODIGO_HTTP[epa_http$CODIGO_HTTP != "200" ])
+num_err <- filter(epa_http, epa_http$CODIGO_HTTP > 300)
+num_err
+``` 
+
