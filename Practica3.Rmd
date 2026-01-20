@@ -99,9 +99,50 @@ datatable(
   )
 )
 ```
+
 ### Pregunta 5:
 Analizar los distintos tipos de peticiones HTTP (GET, POST, PUT, DELETE) 
 gestionadas por el servidor, identificando la frecuencia de cada una de 
-estas. Repetir el análisis, esta vez filtrando previamente aquellas 
-peticiones correspondientes a recursos ofrecidos de tipo imagen. 
+estas. 
 
+```{r get_resp_http_by_type,echo=TRUE}
+# Obtener tipos de respuesta por tipo de HTTP y sus frecuencias
+respuestas_tipo <- epa_http %>%
+  #En este caso separadas por tipo de petición. Lo comento ya que NO se nos pide 
+  #count(PETICION_HTTP, CODIGO_HTTP, name = "NUM_PETIS") %>%
+  count(PETICION_HTTP, name = "NUM_PETIS") %>%
+  arrange(desc(NUM_PETIS))
+
+# Mostrar la tabla de errores completa
+datatable(
+  respuestas_tipo,
+  options = list(
+    pageLength = 15,   # Número de filas por página
+    lengthMenu = c(5, 10, 20),
+    scrollY = "400px",
+    scrollCollapse = TRUE
+  )
+)
+```
+
+### Pregunta 5.1 bis: 
+Repetir el análisis, esta vez filtrando previamente aquellas 
+peticiones correspondientes a recursos ofrecidos de tipo imagen. 
+```{r get_resp_http_by_type_image,echo=TRUE}
+# Mostrar Obtener tipos de peticiones que contengan recursos tipo imagen y sus frecuencias 
+respuestas_tipo_imagen <- epa_http %>%
+filter(str_detect(URL, "\\.(jpg|jpeg|png|gif|bmp|webp)$"))%>%
+count(PETICION_HTTP, name = "NUM_PETIS_WITH_IMAGES") %>%
+arrange(desc(NUM_PETIS_WITH_IMAGES))
+
+# Mostrar la tabla de errores completa
+datatable(
+  respuestas_tipo_imagen,
+  options = list(
+    pageLength = 15,   # Número de filas por página
+    lengthMenu = c(5, 10, 20),
+    scrollY = "400px",
+    scrollCollapse = TRUE
+  )
+)
+```
