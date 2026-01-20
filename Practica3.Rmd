@@ -81,7 +81,7 @@ directamente con el servidor de forma segregada según si los usuarios
 han tenido algún tipo de error en las distintas peticiones ofrecidas por el 
 servidor.
 
-```{r get_resp_code,echo=TRUE}
+```{r get_resp_code,eval=FALSE,echo=TRUE}
 # Obtener los codigos de respuesta erroneos
 
 logs_clasificado <- epa_http %>%
