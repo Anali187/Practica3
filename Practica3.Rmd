@@ -81,14 +81,7 @@ directamente con el servidor de forma segregada según si los usuarios
 han tenido algún tipo de error en las distintas peticiones ofrecidas por el 
 servidor.
 
-```{r get_resp_code,eval=FALSE,echo=FALSE}
-# Obtener los codigos de respuesta erroneos
-#num_error <- as.numeric(epa_http$CODIGO_HTTP[epa_http$CODIGO_HTTP != "200" ])
-num_err <- filter(epa_http, epa_http$CODIGO_HTTP > 300)
-num_err
-``` 
-
-```{r get_resp_code_second_opt,echo=TRUE}
+```{r get_resp_code,echo=TRUE}
 # Obtener los codigos de respuesta erroneos
 
 logs_clasificado <- epa_http %>%
@@ -98,13 +91,13 @@ logs_clasificado <- epa_http %>%
 ```
 
 
-``` {r get_resp_code_third_opt,echo=TRUE}
+``` {r get_resp_code_second_opt,echo=TRUE}
 
-resultado <- epa_http %>%
+epa_http %>%
   filter(CODIGO_HTTP >=400) %>%
   group_by(`FQDN/IP`, CODIGO_HTTP) %>%
   count()
 
-datatable(head(resultado),colnames = c("Usuario", "Codigo respuesta", "Numero errores"))
+datatable(head(epa_http),colnames = c("Usuario", "Codigo respuesta", "Numero errores"))
 ```
 
