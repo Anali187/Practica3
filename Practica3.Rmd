@@ -154,3 +154,17 @@ Estos deberán representar por lo menos 1 o 2 variables diferentes del
 data frame. Describid el gráfico e indicad cualquier observación 
 destacable que se pueda apreciar gracias a la representación gráfica. 
 
+### Pregunta 7:
+Generar un gráfico que permita visualizar el número de peticiones 
+servidas a lo largo del tiempo. 
+
+### Pregunta 8:
+Utilizando un algoritmo de aprendizaje no supervisado, realizad un 
+análisis de clústering con k-means para los datos del servidor. 
+
+### Pregunta 9:
+Representad visualmente en gráficos de tipo scatter plot el resultado de 
+vuestros clústering y interpretad el resultado obtenido (describid las 
+características de los distintos grupos) con los 2 valores distintos de k 
+probados en el apartado anterior en función de los valores de las variables y 
+el número de clúster asignado. 
