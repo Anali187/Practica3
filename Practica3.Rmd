@@ -156,21 +156,34 @@ Estos deberán representar por lo menos 1 o 2 variables diferentes del
 data frame. Describid el gráfico e indicad cualquier observación 
 destacable que se pueda apreciar gracias a la representación gráfica. 
 
-```{r Pregunta6,echo=TRUE}
-ggplot(respuestas_tipo, aes(x = PETICION_HTTP, y = NUM_PETIS, fill = PETICION_HTTP)) +
-  geom_col(color = "black", alpha = 0.85) +
-  scale_fill_brewer(palette = "Set2") +
+```{r Pregunta6, echo=TRUE}
+# Gráfico de frecuencia de tipos de petición HTTP con colores pasteles
+ggplot(epa_http, aes(x = PETICION_HTTP, fill = PETICION_HTTP)) +
+  geom_bar() +
+  scale_fill_manual(values = c(
+    "GET"  = "#A8DADC",   # azul pastel
+    "POST" = "#F6BD60",   # naranja pastel
+    "HEAD" = "#B5E48C"    # verde pastel
+  )) +
   labs(
-    title = "Frecuencia de tipos de peticiones HTTP",
-    x = "Tipo de petición HTTP",
+    title = "Frecuencia de tipos de petición HTTP",
+    x = "Tipo de petición",
     y = "Número de peticiones"
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
-    legend.position = "none",
-    plot.title = element_text(face = "bold", size = 14)
+    axis.line = element_line(color = "black", linewidth = 0.8),
+    axis.ticks = element_line(color = "black", linewidth = 0.8),
+    axis.text = element_text(color = "black", size = 12),
+    axis.title = element_text(face = "bold", size = 13),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"   # si quieres mostrar la leyenda, elimina esta línea
   )
 ```
+
+
+
 
 **Descripción del gráfico:**  
    El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
@@ -178,24 +191,40 @@ ggplot(respuestas_tipo, aes(x = PETICION_HTTP, y = NUM_PETIS, fill = PETICION_HT
 **Interpretación:**  
   Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican envío   de datos.
 
-```{r Pregunta6.1,echo=TRUE}
+```{r Pregunta6.1, echo=TRUE}
 epa_http %>%
   filter(CODIGO_HTTP >= 400) %>%
   count(CODIGO_HTTP) %>%
   ggplot(aes(x = factor(CODIGO_HTTP), y = n, fill = factor(CODIGO_HTTP))) +
-  geom_col(alpha = 0.9) +
-  scale_fill_brewer(palette = "Reds") +
+  geom_col(alpha = 0.95) +
+  scale_fill_manual(values = c(
+    "400" = "#6BAED6",   # azul suave
+    "401" = "#FDAE6B",   # naranja suave
+    "403" = "#74C476",   # verde suave
+    "404" = "#9E9AC8",   # morado suave
+    "500" = "#FB6A4A",   # rojo suave
+    "501" = "#FDD0A2",   # naranja claro suave
+    "502" = "#A1D99B"    # verde claro suave
+  )) +
   labs(
     title = "Distribución de códigos de error HTTP",
     x = "Código de error HTTP",
     y = "Número de peticiones"
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
+    axis.line = element_line(color = "black", linewidth = 0.8),
+    axis.ticks = element_line(color = "black", linewidth = 0.8),
+    axis.text = element_text(color = "black", size = 12),
+    axis.title = element_text(face = "bold", size = 13),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank(),
     legend.position = "none",
     plot.title = element_text(face = "bold", size = 14)
   )
 ```
+
+
 
 **Descripción del gráfico:**  
    El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
