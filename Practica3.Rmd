@@ -16,7 +16,9 @@ library(knitr)
 library(readr)
 library(stringr)
 library(DT)
-
+library(ggplot2)
+library(data.table)
+library(lubridate)
 ```
 
 Análisis de logs de servidor usando R (parte II) 
@@ -154,9 +156,92 @@ Estos deberán representar por lo menos 1 o 2 variables diferentes del
 data frame. Describid el gráfico e indicad cualquier observación 
 destacable que se pueda apreciar gracias a la representación gráfica. 
 
+```{r Pregunta6,echo=TRUE}
+ggplot(respuestas_tipo, aes(x = PETICION_HTTP, y = NUM_PETIS, fill = PETICION_HTTP)) +
+  geom_col(color = "black", alpha = 0.85) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Frecuencia de tipos de peticiones HTTP",
+    x = "Tipo de petición HTTP",
+    y = "Número de peticiones"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+**Descripción del gráfico:**  
+   El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
+
+**Interpretación:**  
+  Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican envío   de datos.
+
+```{r Pregunta6.1,echo=TRUE}
+epa_http %>%
+  filter(CODIGO_HTTP >= 400) %>%
+  count(CODIGO_HTTP) %>%
+  ggplot(aes(x = factor(CODIGO_HTTP), y = n, fill = factor(CODIGO_HTTP))) +
+  geom_col(alpha = 0.9) +
+  scale_fill_brewer(palette = "Reds") +
+  labs(
+    title = "Distribución de códigos de error HTTP",
+    x = "Código de error HTTP",
+    y = "Número de peticiones"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+**Descripción del gráfico:**  
+   El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
+
+**Interpretación:**  
+  Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican envío   de datos.
+
+
 ### Pregunta 7:
 Generar un gráfico que permita visualizar el número de peticiones 
 servidas a lo largo del tiempo. 
+
+```{r Pregunta7, echo=TRUE}
+library(lubridate)
+
+# Limpiar el timestamp tipo Apache: quitar corchetes y quedarnos con la parte de fecha-hora
+epa_http <- epa_http %>%
+  mutate(
+    TS_LIMPIO = str_sub(TIMESTAMP, 2, 20),          # "[01/Jul/1995:00:00:01" -> "01/Jul/1995:00:00:01"
+    FECHA_HORA = dmy_hms(TS_LIMPIO),                # convertir a POSIXct
+    HORA_DIA = hour(FECHA_HORA)                     # extraer la hora (0–23)
+  )
+
+peticiones_por_hora <- epa_http %>%
+  count(HORA_DIA)
+
+peticiones_por_hora$HORA_DIA <- factor(
+  peticiones_por_hora$HORA_DIA,
+  levels = 0:23
+)
+
+ggplot(peticiones_por_hora, aes(x = HORA_DIA, y = n, group = 1)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Número de peticiones servidas por hora",
+    x = "Hora del día",
+    y = "Número de peticiones"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+
 
 ### Pregunta 8:
 Utilizando un algoritmo de aprendizaje no supervisado, realizad un 
