@@ -19,6 +19,8 @@ library(DT)
 library(ggplot2)
 library(data.table)
 library(lubridate)
+library(tidyr)
+library(scales)
 ```
 
 Análisis de logs de servidor usando R (parte II) 
@@ -183,13 +185,11 @@ ggplot(epa_http, aes(x = PETICION_HTTP, fill = PETICION_HTTP)) +
 ```
 
 
-
-
-**Descripción del gráfico:**  
+ - **Descripción del gráfico:**  
    El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
 
-**Interpretación:**  
-  Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican envío   de datos.
+- **Interpretación:**  
+    Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican        envío de datos.
 
 ```{r Pregunta6.1, echo=TRUE}
 epa_http %>%
@@ -225,12 +225,11 @@ epa_http %>%
 ```
 
 
+- **Descripción del gráfico:**  
+    El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
 
-**Descripción del gráfico:**  
-   El gráfico muestra la frecuencia de cada tipo de petición HTTP registrada en el servidor.
-
-**Interpretación:**  
-  Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican envío   de datos.
+- **Interpretación:**  
+    Se observa que el método GET es el más utilizado, lo cual es típico en servidores web que sirven contenido estático.       Otros métodos como POST o HEAD aparecen con menor frecuencia, indicando un uso limitado de operaciones que implican        envío de datos.
 
 
 ### Pregunta 7:
@@ -266,15 +265,11 @@ servidas a lo largo del tiempo.
   )
 ```
 
-  **Descripción del gráfico:** 
-  
-     El gráfico muestra cuántas peticiones recibió el servidor en cada hora del día. El eje X representa las horas(de 00 a      23) y el y indica la cantidad de peticiones registradas en cada una de ellas.
+  - **Descripción del gráfico:** 
+       El gráfico muestra cuántas peticiones recibió el servidor en cada hora del día. El eje X representa las horas(de 00        a 23) y el y indica la cantidad de peticiones registradas en cada una de ellas.
 
-  **Interpretación:**
-  
-    Se observan diferencias en la actividad del servidor a lo largo del día. Algunas horas presentan un mayor número de        peticiones, lo que refleja momentos de mayor uso, mientras que otras muestran una actividad una actividad más baja.        Este patrón permite identificar las horas de mayor carga y entender mejor el compportamiento del tráfico en el            servidor.
-
-
+  - **Interpretación:**
+      Se observan diferencias en la actividad del servidor a lo largo del día. Algunas horas presentan un mayor número de        peticiones, lo que refleja momentos de mayor uso, mientras que otras muestran una actividad una actividad más baja.        Este patrón permite identificar las horas de mayor carga y entender mejor el compportamiento del tráfico en el             servidor.
 
 
 
@@ -282,12 +277,100 @@ servidas a lo largo del tiempo.
 Utilizando un algoritmo de aprendizaje no supervisado, realizad un 
 análisis de clústering con k-means para los datos del servidor. 
 
- Para este análisis debéis repetir la ejecución del modelado con 
-distintos valores de k (número de clústeres) con al menos 2 valores 
-diferentes de k. 
+• Para este análisis debéis repetir la ejecución del modelado con 
+  distintos valores de k (número de clústeres) con al menos 2 valores 
+  diferentes de k. 
 • A fin de retener algo de información sobre el recurso servido, generad 
-una columna numérica derivada de esta con el número de caracteres 
-de la URL servida. 
+  una columna numérica derivada de esta con el número de caracteres 
+  de la URL servida. 
+
+```{r Pregunta8, echo=TRUE}
+
+# 1. Crear columna numérica: longitud de la URL
+epa_http$URL_LENGTH <- nchar(epa_http$URL)
+
+# 2. Seleccionar variables numéricas para el clustering
+df_kmeans <- epa_http %>%
+  select(CODIGO_HTTP, BYTES_RESPUESTA, URL_LENGTH)
+
+# Reemplazar NA por 0 para evitar pérdida de filas
+df_kmeans[is.na(df_kmeans)] <- 0
+
+# 3. Escalar los datos
+df_scaled <- scale(df_kmeans)
+
+# 4. Ejecutar k-means con dos valores de k
+set.seed(123)
+k2 <- kmeans(df_scaled, centers = 2, nstart = 25)
+k3 <- kmeans(df_scaled, centers = 3, nstart = 25)
+
+# 5. Añadir los clusters al dataset original
+epa_http$cluster_k2 <- k2$cluster
+epa_http$cluster_k3 <- k3$cluster
+
+# 6. Mostrar resultados de forma ordenada
+cat("\n=====================================\n")
+cat("        RESULTADOS K-MEANS (k = 2)\n")
+cat("=====================================\n\n")
+
+cat("Tamaño de los clusters (k = 2):\n")
+print(k2$size)
+
+cat("\nCentroides (k = 2):\n")
+print(k2$centers)
+
+cat("\n\n=====================================\n")
+cat("        RESULTADOS K-MEANS (k = 3)\n")
+cat("=====================================\n\n")
+
+cat("Tamaño de los clusters (k = 3):\n")
+print(k3$size)
+
+cat("\nCentroides (k = 3):\n")
+print(k3$centers)
+
+# 7. Crear dataset limpio para graficar (evita eliminar miles de filas)
+epa_plot <- epa_http %>%
+  filter(!is.na(URL_LENGTH), !is.na(BYTES_RESPUESTA)) %>%
+  filter(BYTES_RESPUESTA < quantile(BYTES_RESPUESTA, 0.99))
+
+# 8. Gráfico k = 2
+ggplot(epa_plot, aes(x = URL_LENGTH, y = BYTES_RESPUESTA, color = factor(cluster_k2))) +
+  geom_point(alpha = 0.5, size = 2) +
+  scale_color_manual(values = c("1" = "#6BAED6", "2" = "#FDAE6B")) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Clustering k-means (k = 2)",
+    x = "Longitud de la URL",
+    y = "Bytes de respuesta",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+# 9. Gráfico k = 3
+ggplot(epa_plot, aes(x = URL_LENGTH, y = BYTES_RESPUESTA, color = factor(cluster_k3))) +
+  geom_point(alpha = 0.5, size = 2) +
+  scale_color_manual(values = c("1" = "#6BAED6", "2" = "#FDAE6B", "3" = "#74C476")) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Clustering k-means (k = 3)",
+    x = "Longitud de la URL",
+    y = "Bytes de respuesta",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+```
 
 
 ### Pregunta 9:
@@ -296,3 +379,77 @@ vuestros clústering y interpretad el resultado obtenido (describid las
 características de los distintos grupos) con los 2 valores distintos de k 
 probados en el apartado anterior en función de los valores de las variables y 
 el número de clúster asignado. 
+
+```{r Pregunta9, echo=TRUE}
+
+
+
+# Dataset limpio para graficar (evita eliminar miles de filas)
+epa_plot <- epa_http %>%
+  filter(!is.na(URL_LENGTH), !is.na(BYTES_RESPUESTA)) %>%
+  filter(BYTES_RESPUESTA < quantile(BYTES_RESPUESTA, 0.99))
+
+# ============================
+#   Scatter plot para k = 2
+# ============================
+
+ggplot(epa_plot, aes(x = URL_LENGTH, y = BYTES_RESPUESTA, color = factor(cluster_k2))) +
+  geom_point(alpha = 0.5, size = 2) +
+  scale_color_manual(values = c("1" = "#6BAED6", "2" = "#FDAE6B")) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Clustering k-means (k = 2)",
+    x = "Longitud de la URL",
+    y = "Bytes de respuesta",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+- **Descripción del gráfico:**  
+    En el grafico con K =2,, los datos se dividen en dos grupos bien diferenciados:
+      - **Cluster1: URLS más largos y respuestas más grandes. Representa peticiones "Pesadas", que requieren servir más              información.
+      - **Cluster2: URLs cortas y respuestas pequeñas. Representa peticiones simples o ligeras.
+      
+    La separación entre ambos grupo es clara en el scatter plot, lo que indica que estas dos viareables son útiles para        segmentar el tra´fico del servidor.
+
+
+
+```{r Pregunta9.1, echo=TRUE}
+# ============================
+#   Scatter plot para k = 3
+# ============================
+
+ggplot(epa_plot, aes(x = URL_LENGTH, y = BYTES_RESPUESTA, color = factor(cluster_k3))) +
+  geom_point(alpha = 0.5, size = 2) +
+  scale_color_manual(values = c("1" = "#6BAED6", "2" = "#FDAE6B", "3" = "#74C476")) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Clustering k-means (k = 3)",
+    x = "Longitud de la URL",
+    y = "Bytes de respuesta",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+```
+
+
+- **Descripción del gráfico:**  
+    En el grafico con K =3, el algoritmo produce una segmentación más detallada:
+      - **Cluster1: URLs muy largas y respuestas grandes.
+      - **Cluster2: URLs cortas y respuestas pequeñas, posiblemente asociadas a errores o recursos 
+      - **Cluster3: URLs Valores intermedios en URL y bytes, representando peticiones normales del servidor.
+      
+    Este modelo permite distinguir entre peticiones pesadas, ligeras y de carga media.
+
