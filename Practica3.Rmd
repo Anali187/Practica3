@@ -209,36 +209,42 @@ Generar un gráfico que permita visualizar el número de peticiones
 servidas a lo largo del tiempo. 
 
 ```{r Pregunta7, echo=TRUE}
-library(lubridate)
+# Extraer la hora del timestamp original (formato [DD:HH:MM:SS])
+  epa_http$HORA_DIA <- str_sub(epa_http$TIMESTAMP, start = 5, end = 6)
+  epa_http$HORA_DIA <- as.numeric(epa_http$HORA_DIA)
 
-# Limpiar el timestamp tipo Apache: quitar corchetes y quedarnos con la parte de fecha-hora
-epa_http <- epa_http %>%
-  mutate(
-    TS_LIMPIO = str_sub(TIMESTAMP, 2, 20),          # "[01/Jul/1995:00:00:01" -> "01/Jul/1995:00:00:01"
-    FECHA_HORA = dmy_hms(TS_LIMPIO),                # convertir a POSIXct
-    HORA_DIA = hour(FECHA_HORA)                     # extraer la hora (0–23)
+# Contar peticiones por hora
+  peticiones_por_hora <- epa_http %>%
+    count(HORA_DIA)
+
+# Gráfico con ejes remarcados
+  ggplot(peticiones_por_hora, aes(x = HORA_DIA, y = n, group = 1)) +
+    geom_line(color = "#2C3E50", linewidth = 1.2) +
+    geom_point(color = "#E74C3C", size = 3) +
+    labs(
+      title = "Número de peticiones servidas por hora",
+      x = "Hora del día",
+      y = "Número de peticiones"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(
+      axis.line = element_line(color = "black", linewidth = 0.8),
+      axis.ticks = element_line(color = "black", linewidth = 0.8),
+      axis.text = element_text(color = "black", size = 12),
+      axis.title = element_text(face = "bold", size = 13),
+      panel.grid.major = element_line(color = "grey85"),
+      panel.grid.minor = element_blank()
   )
-
-peticiones_por_hora <- epa_http %>%
-  count(HORA_DIA)
-
-peticiones_por_hora$HORA_DIA <- factor(
-  peticiones_por_hora$HORA_DIA,
-  levels = 0:23
-)
-
-ggplot(peticiones_por_hora, aes(x = HORA_DIA, y = n, group = 1)) +
-  geom_line() +
-  geom_point() +
-  labs(
-    title = "Número de peticiones servidas por hora",
-    x = "Hora del día",
-    y = "Número de peticiones"
-  ) +
-  theme_minimal()
-
-
 ```
+
+  **Descripción del gráfico:** 
+  
+     El gráfico muestra cuántas peticiones recibió el servidor en cada hora del día. El eje X representa las horas(de 00 a      23) y el y indica la cantidad de peticiones registradas en cada una de ellas.
+
+  **Interpretación:**
+  
+    Se observan diferencias en la actividad del servidor a lo largo del día. Algunas horas presentan un mayor número de        peticiones, lo que refleja momentos de mayor uso, mientras que otras muestran una actividad una actividad más baja.        Este patrón permite identificar las horas de mayor carga y entender mejor el compportamiento del tráfico en el            servidor.
+
 
 
 
