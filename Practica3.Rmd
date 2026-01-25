@@ -16,7 +16,8 @@ library(knitr)
 library(readr)
 library(stringr)
 library(DT)
-
+library(mltools) 
+library(data.table) 
 ```
 
 Análisis de logs de servidor usando R (parte II) 
@@ -169,6 +170,13 @@ diferentes de k.
 una columna numérica derivada de esta con el número de caracteres 
 de la URL servida. 
 
+```{r check_kmeans_algorithm,echo=TRUE}
+#
+epa_http_one_hot <- one_hot(as.data.table(epa_http), sparsifyNAs = TRUE) 
+
+epa_http_one_hot
+
+``` 
 
 ### Pregunta 9:
 Representad visualmente en gráficos de tipo scatter plot el resultado de 
